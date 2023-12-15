@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Widget</title>
+    <link rel="stylesheet" href="weather.css">
+</head>
+<body>
+    <h1>Weather Data</h1>
+    <br>
+
+    <div id="weatherWidget">
+        <img id="weatherIcon" alt="Weather Icon">
+        <p id="weatherText"></p>
+    </div>
+
+    <noscript>
+        <p>Current Weather Conditions Unavailable. Please enable JavaScript.</p>
+    </noscript>
+
+
+    <script>
+        let lastdata;
+
+        async function fetchData() {
+            const response = await fetch("https://api.weather.gov/points/32.8426,-117.2577");
+            const data = await response.json();
+            const forecastResponse = await fetch(data["properties"]["forecast"]);
+            lastdata = await forecastResponse.json();
+            const weatherData = lastdata["properties"]["periods"]["0"];
+            return weatherData;
+        }
+
+        (async () => {
+            const weatherData = await fetchData();
+
+        const shortForecast = weatherData["shortForecast"];
+        const temperature = `${weatherData["temperature"]} ${weatherData["temperatureUnit"]}`;
+        const windSpeed = weatherData["windSpeed"];
+        const humidity = `${weatherData["relativeHumidity"]["value"]}%`;
+
+const weatherTextElement = document.getElementById("weatherText");
+weatherTextElement.innerHTML = `${shortForecast}<br>Temperature: ${temperature}<br>Wind Speed: ${windSpeed}<br>Humidity: ${humidity}`;
+
+            const weatherIconElement = document.getElementById("weatherIcon");
+            weatherIconElement.src = getWeatherIconPath(weatherData["shortForecast"]);
+        })();
+
+        function getWeatherIconPath(shortForecast) {
+            
+        if (shortForecast.toLowerCase().includes("sunny")) {
+        return "icon1.png";
+        } else if (shortForecast.toLowerCase().includes("rain")) {
+        return "icon2.png";
+        } else if (shortForecast.toLowerCase().includes("snow")) {
+        return "icon3.png";
+        } else {
+        return "icon4.png";
+     }
+        }
+    </script>
+</body>
+</html>
